@@ -1,0 +1,51 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Scenes/Characters/Kzshantji.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Scripts/Main.gd" type="Script" id=2]
+[ext_resource path="res://Scenes/Characters/Zonshra.tscn" type="PackedScene" id=3]
+
+[node name="Main" type="Node2D"]
+script = ExtResource( 2 )
+
+[node name="Grid" type="GridContainer" parent="."]
+margin_left = 104.0
+margin_top = 23.0
+margin_right = 672.0
+margin_bottom = 487.0
+columns = 12
+
+[node name="Kzshantji" parent="Grid" instance=ExtResource( 1 )]
+position = Vector2( 64, 65 )
+
+[node name="Zonshra" parent="Grid" instance=ExtResource( 3 )]
+position = Vector2( 149, 20 )
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="range" type="Label" parent="UI"]
+margin_left = 866.0
+margin_top = 55.0
+margin_right = 890.0
+margin_bottom = 69.0
+text = "null"
+
+[node name="debug" type="Label" parent="UI"]
+margin_left = 866.0
+margin_top = 76.0
+margin_right = 890.0
+margin_bottom = 90.0
+text = "null"
+
+[node name="Move" type="Button" parent="UI"]
+margin_left = 850.0
+margin_top = 174.0
+margin_right = 897.0
+margin_bottom = 194.0
+text = "Move"
+
+[node name="Undo" type="Button" parent="UI"]
+margin_left = 850.0
+margin_top = 143.0
+margin_right = 897.0
+margin_bottom = 163.0
+text = "Undo"
