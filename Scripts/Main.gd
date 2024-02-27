@@ -7,7 +7,7 @@ var characters = []
 var overlappingBodies = []
 var moveableGrid = []
 var gridRange = 5
-var colums
+var columns
 var rows
 var width = 0
 var height = 0
@@ -143,9 +143,9 @@ func _ready():
 	$Grid.add_child(selectedUI)
 	selectedUI.hide()
 	
-	colums = $Grid.columns
-	rows = colums
-	width = gridRange * colums
+	columns = $Grid.columns
+	rows = columns
+	width = gridRange * columns
 	height = gridRange * rows
 	$UI/range.text = str(width) + " x " + str(height)
 	$UI/debug.text = str(selectedGrids)
@@ -158,8 +158,8 @@ func find_accessible_range(selected_number: int, movementRange: int, ignore_numb
 	
 	# Calculate row and column
 # warning-ignore:integer_division
-	var row = (selected_number - 1) / 12 + 1
-	var col = (selected_number - 1) % 12 + 1
+	var row = (selected_number - 1) / rows + 1
+	var col = (selected_number - 1) % columns + 1
 	
 	# Calculate row and column limits
 	var row_lower_limit = max(1, row - movementRange/gridRange)
