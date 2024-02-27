@@ -8,11 +8,11 @@
 script = ExtResource( 2 )
 
 [node name="Grid" type="GridContainer" parent="."]
-margin_left = 104.0
-margin_top = 23.0
-margin_right = 672.0
-margin_bottom = 487.0
-columns = 12
+margin_left = 88.0
+margin_top = 43.0
+margin_right = 744.0
+margin_bottom = 517.0
+columns = 15
 
 [node name="Kzshantji" parent="Grid" instance=ExtResource( 1 )]
 position = Vector2( 64, 65 )

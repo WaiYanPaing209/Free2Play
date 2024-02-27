@@ -28,6 +28,12 @@ config/icon="res://icon.png"
 
 Game="*res://Autoload/Game.gd"
 
+[display]
+
+window/size/height=800
+window/size/test_width=1024
+window/size/test_height=800
+
 [gui]
 
 common/drop_mouse_on_gui_input_disabled=true

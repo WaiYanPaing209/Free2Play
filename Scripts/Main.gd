@@ -9,6 +9,7 @@ var moveableGrid = []
 var gridRange = 5
 var columns
 var rows
+var area
 var width = 0
 var height = 0
 var selected = false
@@ -113,7 +114,15 @@ func onMouseExited(grid):
 	selectedUI.hide()
 	
 func _ready():
-	for i in range(0,144):
+	columns = $Grid.columns
+	rows = columns
+	width = gridRange * columns
+	height = gridRange * rows
+	area = rows * columns
+	$UI/range.text = str(width) + " x " + str(height)
+	$UI/debug.text = str(selectedGrids)
+	
+	for i in range(0,int(area)):
 		var gridInstance = grid.instance()
 		gridInstance.set_name(str(i))
 		$Grid.add_child(gridInstance)
@@ -130,10 +139,8 @@ func _ready():
 			kzshantji = character
 		elif character.get_name() == "Zonshra":
 			zonshra = character
-#	Game.kzshantjiPos = kzshantji.position
-#	Game.zonshraPos = zonshra.position
+
 # warning-ignore:return_value_discarded
-	
 # warning-ignore:return_value_discarded
 	$UI/Undo.connect("pressed",self,"undoPressed")
 	$UI/Move.connect("pressed", self, "movePressed")
@@ -142,16 +149,6 @@ func _ready():
 	selectedUI.scale = Vector2(1.25,1.25)
 	$Grid.add_child(selectedUI)
 	selectedUI.hide()
-	
-	columns = $Grid.columns
-	rows = columns
-	width = gridRange * columns
-	height = gridRange * rows
-	$UI/range.text = str(width) + " x " + str(height)
-	$UI/debug.text = str(selectedGrids)
-
-
-	
 	
 func find_accessible_range(selected_number: int, movementRange: int, ignore_number: int) -> Array:
 	var accessible_numbers: Array = []
@@ -163,14 +160,14 @@ func find_accessible_range(selected_number: int, movementRange: int, ignore_numb
 	
 	# Calculate row and column limits
 	var row_lower_limit = max(1, row - movementRange/gridRange)
-	var row_upper_limit = min(12, row + movementRange/gridRange)
+	var row_upper_limit = min(rows, row + movementRange/gridRange)
 	var col_lower_limit = max(1, col - movementRange/gridRange)
-	var col_upper_limit = min(12, col + movementRange/gridRange)
+	var col_upper_limit = min(columns, col + movementRange/gridRange)
 	
 	# Add accessible numbers within the limits
 	for r in range(row_lower_limit, row_upper_limit + 1):
 		for c in range(col_lower_limit, col_upper_limit + 1):
-			var num = (r - 1) * 12 + c
+			var num = (r - 1) * rows + c
 			if num != selected_number and num != ignore_number:
 				accessible_numbers.append(num)
 	
