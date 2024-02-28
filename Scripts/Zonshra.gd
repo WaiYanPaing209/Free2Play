@@ -1,5 +1,5 @@
 extends KinematicBody2D
-class_name Kzshantji
+class_name Zonshra
 
 var destinatedPos = Vector2.ZERO
 var startPos = Vector2.ZERO

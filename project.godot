@@ -9,13 +9,25 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "KinematicBody2D",
+"class": "Kzshantji",
+"language": "GDScript",
+"path": "res://Scripts/Kzshantji.gd"
+}, {
 "base": "Reference",
 "class": "SQLiteWrapper",
 "language": "GDScript",
 "path": "res://addons/godot-sqlite/godot-sqlite-wrapper.gd"
+}, {
+"base": "KinematicBody2D",
+"class": "Zonshra",
+"language": "GDScript",
+"path": "res://Scripts/Zonshra.gd"
 } ]
 _global_script_class_icons={
-"SQLiteWrapper": ""
+"Kzshantji": "",
+"SQLiteWrapper": "",
+"Zonshra": ""
 }
 
 [application]
@@ -32,7 +44,7 @@ Game="*res://Autoload/Game.gd"
 
 window/size/height=800
 window/size/test_width=1024
-window/size/test_height=800
+window/size/test_height=600
 
 [gui]
 

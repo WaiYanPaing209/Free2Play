@@ -356,7 +356,6 @@ tracks/0/keys = {
 }
 
 [node name="D20" type="Sprite"]
-position = Vector2( 426, 369 )
 texture = ExtResource( 1 )
 hframes = 5
 vframes = 5
@@ -386,12 +385,4 @@ anims/9 = SubResource( 21 )
 anims/RESET = SubResource( 2 )
 anims/rolling = SubResource( 22 )
 
-[node name="roll" type="Button" parent="."]
-margin_left = 5.0
-margin_top = 140.0
-margin_right = 38.0
-margin_bottom = 160.0
-text = "roll"
-
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_AnimationPlayer_animation_finished"]
-[connection signal="pressed" from="roll" to="." method="_on_roll_pressed"]

@@ -2,26 +2,28 @@ extends Sprite
 
 var outcome
 var favor = 1
-var luck = 0.5
-
-func _ready():
-	$roll.pressed = true
-
+var luck = 0.4
+var previousOutcomes = []
 
 func calculateOutcome():
 	randomize()
 	var randomValue = randf()
-	print(randomValue)
+	var newOutcome
 	if randomValue < luck:
-		outcome = round(rand_range(11, 20))  
+		newOutcome = round(rand_range(11, 20))  
 	else:
-		outcome = round(rand_range(1, 20))
+		newOutcome = round(rand_range(1, 20))
+	
+	while newOutcome in previousOutcomes:
+		newOutcome = round(rand_range(1, 20))
+	
+	previousOutcomes.append(newOutcome)
+	outcome = newOutcome
 
 func _on_AnimationPlayer_animation_finished(anim_name):
 	if anim_name == "rolling":
 		$AnimationPlayer.play(str(outcome))
+		Game.emit_signal("d20Result",outcome)
 
 
-func _on_roll_pressed():
-	$AnimationPlayer.play("rolling")
-	calculateOutcome()
+	
