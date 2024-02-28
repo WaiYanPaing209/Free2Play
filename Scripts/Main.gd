@@ -179,6 +179,21 @@ func findOccupiedSpace():
 
 func detectChanges():
 	findOccupiedSpace()
+	
+func nextTurn():
+	var current_index = Game.INITATIVE.find(Game.TURN)
+	if current_index == Game.INITATIVE.size() - 1:
+		Game.TURN = Game.INITATIVE[0].name
+		rounds.text = str(int(rounds.text) + 1)
+	else:
+		Game.TURN = Game.INITATIVE[current_index + 1].name
+	turn.text = str(Game.TURN) + "'s Turn"
+	for i in range(initiateGrid.get_child_count()):
+		var label = initiateGrid.get_child(i)
+		if label.text == Game.TURN:
+			label.add_color_override("font_color", Color(1, 0, 0, 1))  # Change font color to red
+		else:
+			label.add_color_override("font_color", Color(0, 0, 0, 0))  # Change font color to black
 
 func initializeGame():
 	Game.INITATIVE = characters
@@ -189,6 +204,8 @@ func initializeGame():
 		var label = labelPreload.instance()
 		var name = Game.INITATIVE[i].name
 		label.text = str(name)
+		if name == Game.TURN:
+			label.add_color_override("font_color", Color(1, 0, 0, 1))
 		initiateGrid.add_child(label)
 
 
