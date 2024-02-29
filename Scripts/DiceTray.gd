@@ -33,7 +33,11 @@ func _on_roll_pressed():
 	D20.calculateOutcome()
 	var outcome = D20.outcome
 	secondD20.hide()
+	roll.disabled = true
+	roll.modulate = Color(1,1,1,.7)
 	yield(get_tree().create_timer(1.75), "timeout")
+	roll.disabled = false
+	roll.modulate = Color(1,1,1,1)
 	emit_signal("D20Result",outcome)
 
 
@@ -53,7 +57,11 @@ func _on_roll_with_advantage_pressed():
 		outcome = secondD20Outcome
 	else:
 		outcome = secondD20Outcome
+	rollWithAdvantage.disabled = true
+	rollWithAdvantage.modulate = Color(1,1,1,.7)
 	yield(get_tree().create_timer(1.75), "timeout")
+	rollWithAdvantage.disabled = false
+	rollWithAdvantage.modulate = Color(1,1,1,1)
 	emit_signal("advantageD20Result",outcome)
 	
 func onAdvantageD20Result(outcome):

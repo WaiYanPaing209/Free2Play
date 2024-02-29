@@ -1,0 +1,125 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://Assets/Images/spell card no text.png" type="Texture" id=1]
+[ext_resource path="res://Assets/Images/spell card no text bw.png" type="Texture" id=2]
+[ext_resource path="res://Assets/Fonts/Bookinsanity.otf" type="DynamicFontData" id=3]
+[ext_resource path="res://Scripts/spellCard.gd" type="Script" id=4]
+
+[sub_resource type="DynamicFont" id=3]
+size = 30
+use_filter = true
+font_data = ExtResource( 3 )
+
+[sub_resource type="DynamicFont" id=2]
+size = 14
+use_filter = true
+font_data = ExtResource( 3 )
+
+[sub_resource type="DynamicFont" id=1]
+size = 30
+use_filter = true
+font_data = ExtResource( 3 )
+
+[node name="spellCard" type="Control"]
+script = ExtResource( 4 )
+
+[node name="texture" type="TextureRect" parent="."]
+margin_right = 340.0
+margin_bottom = 480.0
+texture = ExtResource( 1 )
+expand = true
+stretch_mode = 5
+
+[node name="name" type="Label" parent="texture"]
+margin_left = 46.0
+margin_top = 31.0
+margin_right = 298.0
+margin_bottom = 63.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 3 )
+text = "Name"
+align = 1
+
+[node name="components" type="Label" parent="texture"]
+margin_left = 30.0
+margin_top = 112.0
+margin_right = 132.0
+margin_bottom = 129.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 2 )
+text = "components"
+align = 1
+
+[node name="level" type="Label" parent="texture"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 161.0
+margin_top = 373.0
+margin_right = -162.0
+margin_bottom = -75.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 1 )
+text = "5"
+
+[node name="casingTime" type="Label" parent="texture"]
+margin_left = 46.0
+margin_top = 414.0
+margin_right = 134.0
+margin_bottom = 431.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 2 )
+text = "time"
+align = 1
+
+[node name="description" type="Label" parent="texture"]
+margin_left = 27.0
+margin_top = 141.0
+margin_right = 319.0
+margin_bottom = 355.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 2 )
+text = "\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\"\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\"\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\""
+autowrap = true
+clip_text = true
+
+[node name="duration" type="Label" parent="texture"]
+margin_left = 23.0
+margin_top = 77.0
+margin_right = 192.0
+margin_bottom = 94.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 2 )
+text = "duration"
+align = 1
+clip_text = true
+
+[node name="school" type="Label" parent="texture"]
+margin_left = 214.0
+margin_top = 77.0
+margin_right = 315.0
+margin_bottom = 94.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 2 )
+text = "school"
+align = 1
+
+[node name="range" type="Label" parent="texture"]
+margin_left = 216.0
+margin_top = 412.0
+margin_right = 272.0
+margin_bottom = 429.0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 2 )
+text = "range"
+align = 1
+
+[node name="BG" type="TextureRect" parent="."]
+margin_right = 340.0
+margin_bottom = 480.0
+texture = ExtResource( 2 )
+expand = true
+stretch_mode = 5
+__meta__ = {
+"_edit_group_": true,
+"_edit_lock_": true
+}
