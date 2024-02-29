@@ -1,9 +1,9 @@
 extends KinematicBody2D
-class_name Jex
+class_name Drel
 
 var stats = {
 	"STR" : 10,
-	"DEX" : 10,
+	"DEX" : 18,
 }
 
 var destinatedPos = Vector2.ZERO
@@ -25,4 +25,3 @@ func _ready():
 func move_to(destinatedPos):
 	tween.interpolate_property(self, "position", self.position, destinatedPos, destinatedPos.distance_to(self.position) / shiftSpeed, Tween.TRANS_LINEAR, Tween.EASE_IN_OUT)
 	tween.start()
-

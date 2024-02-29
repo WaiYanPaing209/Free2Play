@@ -15,6 +15,7 @@ onready var rounds = $UI/mainUI_BG/Rounds
 onready var initiateGrid = $UI/mainUI_BG/InitiativeGrid
 
 signal detectChanges
+signal nextTurn
 
 var characters = []
 var overlappingBodies = []
@@ -26,9 +27,9 @@ var area
 var width = 0
 var height = 0
 var selected = false
-var selectedGrids = 0
-var maxGrids = 6 # default
+var selectedGrid = null
 var is_pressed = false
+var isMoveable
 var speedDefault = 30
 var spawned = false
 
@@ -38,19 +39,20 @@ var selectedUI = Sprite.new()
 var controlUI = Sprite.new()
 
 func clearGrid():
-	for child in $Grid.get_children():
+	for child in GRID.get_children():
 		if child is TextureButton:
 			child.modulate = Color("#4e160c0c")
 
 # warning-ignore:shadowed_variable
-func modulateGrids(moveableGrid: Array):
+func modulateGrids(moveableGrid: Array, excludeGridName: String = ""):
 	for child in $Grid.get_children():
-				if child is TextureButton:
-					var gridNum = int(child.get_name()) + 1
-					if moveableGrid.find(gridNum) != -1:
-						child.modulate = Color("#9d13582b")  # Modulate color for accessible grids
-					else:
-						child.modulate = Color("#4e160c0c")  # Modulate color for non-accessible grids
+		if child is TextureButton:
+			var gridNum = int(child.get_name()) + 1
+			if moveableGrid.find(gridNum) != -1:
+				if child.name != excludeGridName:
+					child.modulate = Color("#9d13582b")  # Modulate color for accessible grids
+			else:
+				child.modulate = Color("#4e160c0c")  # Modulate color for non-accessible grids
 
 
 # warning-ignore:shadowed_variable
@@ -61,19 +63,27 @@ func onPressed(grid, gridName):
 	Game.movePos = grid.rect_position
 	Game.gridPos = int(gridName) + 1
 	emit_signal("detectChanges")
+
 	var zone = grid.get_node("detectionZone")
 	overlappingBodies = zone.get_overlapping_bodies()
 	if overlappingBodies.size() > 0:
 		Game.selectedCharacter = overlappingBodies[0].name
-		debug.text = Game.selectedCharacter + " Selected" if name != null else ""
+		spawned = false
+		if Game.selectedCharacter == Game.TURN:
+			debug.text = Game.selectedCharacter + " Selected" if name != null else ""
+		else:
+			debug.text = "Not the turn of " + Game.selectedCharacter
 		for character in characters:
+# warning-ignore:unused_variable
 			var chrName = character.name
-			if Game.selectedCharacter == chrName:
+			if Game.selectedCharacter == Game.TURN:
 				character.z_index = 2
-				moveableGrid = find_accessible_range(int(Game.gridPos), 30, Game.occupiedSpace)
-				modulateGrids(moveableGrid)
+				moveableGrid = find_accessible_range(int(Game.gridPos), character.speed, Game.occupiedSpace)
+				modulateGrids(moveableGrid,"")
+				selectedGrid = grid
+				isMoveable = moveableGrid.find(Game.gridPos) != -1
 			else:
-				character.z_index = 0
+				return
 	else:
 		debug.text = ""
 
@@ -82,9 +92,12 @@ func onPressed(grid, gridName):
 		grid.modulate = Color("#db0051a7")
 	else:
 		grid.modulate = Color("#db0051a7")
+		if not isMoveable:
+		# Reset modulate for other grids
+			modulateGrids(moveableGrid, gridName)
 
 func movePressed():
-	var isMoveable = moveableGrid.find(Game.gridPos) != -1
+	isMoveable = moveableGrid.find(Game.gridPos) != -1
 	if isMoveable:
 		for character in characters:
 			if Game.selectedCharacter == character.name:
@@ -92,9 +105,9 @@ func movePressed():
 				character.move_to(Game.movePos + Vector2(20, 20))
 				clearGrid()
 	else:
-		print("Invaild Move!")
 		debug.text = "Invalid Move!"
 	emit_signal("detectChanges")
+	emit_signal("nextTurn")
 	
 	
 func undoPressed():
@@ -128,17 +141,16 @@ func _ready():
 		gridInstance.connect("mouse_entered",self,"onMouseEntered",[gridInstance])
 		gridInstance.connect("mouse_exited",self,"onMouseExited",[gridInstance])
 		
-	for j in GRID.get_children():
-		if j is KinematicBody2D:
-			characters.append(j)
+	rollForInitiative()
 
-	print("Characters Initiated: ",characters)
+	
 
 # warning-ignore:return_value_discarded
 # warning-ignore:return_value_discarded
 	undoButton.connect("pressed",self,"undoPressed")
 	moveButton.connect("pressed", self, "movePressed")
 	connect("detectChanges",self,"detectChanges")
+	connect("nextTurn",self,"onNextTurn")
 		
 	selectedUI.texture = selectedUi
 	selectedUI.scale = Vector2(1.25,1.25)
@@ -148,6 +160,50 @@ func _ready():
 	findOccupiedSpace()
 	initializeGame()
 	
+func rollForInitiative():
+	randomize()
+	for j in GRID.get_children():
+		if j.is_in_group("Characters"):
+			characters.append(j)
+	
+	for character in characters:
+		character.initiative = int(round(rand_range(1,20)))
+		print(character.name, ": ", character.initiative)
+
+	# Sort the characters based on their initiative values
+	characters.sort_custom(self, "_compareInitiative")
+
+	print("Characters Initiated and Sorted: ", characters)
+
+# Custom comparison function for sorting characters based on initiative
+func _compareInitiative(a, b):
+	if a.initiative == b.initiative:
+		# If initiatives are the same, compare "DEX" stat
+		return a.stats["DEX"] > b.stats["DEX"]
+	else:
+		# Otherwise, compare initiatives
+		return a.initiative > b.initiative
+
+
+func onNextTurn():
+	if Game.TURNINDEX < Game.TOTALINITIATIVE:
+		Game.TURNINDEX += 1
+		Game.TURN = Game.INITATIVE[Game.TURNINDEX].name
+		refreshChanges()
+	else:
+		Game.TURNINDEX = 0
+		Game.TURN = Game.INITATIVE[Game.TURNINDEX].name
+		refreshChanges()
+
+func refreshChanges():
+	turn.text = str(Game.TURN) + "'s Turn"
+	for i in range(initiateGrid.get_child_count()):
+		var label = initiateGrid.get_child(i)
+		if label.text == Game.TURN:
+			label.add_color_override("font_color", Color(1, 0, 0, 1))  # Change font color to red
+		else:
+			label.add_color_override("font_color", Color(1, 1, 1, 1)) 
+
 func find_accessible_range(selected_number: int, movementRange: int, ignore_numbers: Array) -> Array:
 	var accessible_numbers: Array = []
 # warning-ignore:integer_division
@@ -197,9 +253,12 @@ func nextTurn():
 
 func initializeGame():
 	Game.INITATIVE = characters
-	Game.TURN = characters[0].name
+	Game.TURN = characters[Game.TURNINDEX].name
+	Game.TOTALINITIATIVE = Game.INITATIVE.size() - 1 # to match with array index
 	turn.text = str(Game.TURN) + "'s Turn"
 	rounds.text = str("0")
+#	Game.selectedCharacter = Game.TURN
+	print(Game.selectedCharacter)
 	for i in Game.INITATIVE.size():
 		var label = labelPreload.instance()
 		var name = Game.INITATIVE[i].name

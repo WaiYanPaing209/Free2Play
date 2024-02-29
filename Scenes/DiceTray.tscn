@@ -30,9 +30,12 @@ __meta__ = {
 
 [node name="D20" parent="bg" instance=ExtResource( 1 )]
 position = Vector2( 484, 283 )
+scale = Vector2( 0.7, 0.7 )
 
 [node name="secondD20" parent="bg" instance=ExtResource( 1 )]
+visible = false
 position = Vector2( 259, 243 )
+scale = Vector2( 0.7, 0.7 )
 
 [node name="outcome" type="Label" parent="bg"]
 margin_left = 672.0
@@ -42,10 +45,18 @@ margin_bottom = 177.0
 custom_fonts/font = SubResource( 1 )
 text = "20"
 
-[node name="roll" type="Button" parent="bg"]
-margin_left = 309.0
+[node name="advantageRoll" type="Button" parent="bg"]
+margin_left = 5.99997
 margin_top = 457.0
-margin_right = 400.0
+margin_right = 303.0
 margin_bottom = 505.0
+custom_fonts/font = SubResource( 2 )
+text = "roll with advantage"
+
+[node name="roll" type="Button" parent="bg"]
+margin_left = 340.0
+margin_top = 461.0
+margin_right = 431.0
+margin_bottom = 509.0
 custom_fonts/font = SubResource( 2 )
 text = "roll"
