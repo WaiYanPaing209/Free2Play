@@ -1,34 +1,47 @@
 extends Control
 
 onready var spellCardPreload = preload("res://Scenes/spellCards/spellCard.tscn")
+onready var spellCard = spellCardPreload.instance()
+onready var pos = $position
+onready var selectedCard = $selectedCard
+
+onready var cardOriginalPos
 
 func _ready():
 	var i = 0
 	for spell_name in JsonData.ninethLevelSpells.keys():
-		var spellCard = spellCardPreload.instance()
+		spellCard = spellCardPreload.instance()
 		var spell_info = JsonData.ninethLevelSpells[spell_name]
-		spellCard.get_node("texture/description").text = str(spell_info["description"])
-		spellCard.get_node("texture/duration").text = str(spell_info["duration"])
-		spellCard.get_node("texture/name").text = str(spell_name)
+		spellCard.get_node("BG/name").text = str(spell_name)
+		spellCard.get_node("BG/duration").text = str(spell_info["duration"])
+		var components = str(spell_info["components"])
+		var index = components.find("(")
+		if index != -1:
+			components = components.get_slice("(", 0).strip_edges()
+			 
+		spellCard.get_node("BG/components").text = components
+		spellCard.get_node("BG/level").text = str(spell_info["level"])
+		spellCard.get_node("BG/range").text = str(spell_info["range"])
+		spellCard.get_node("BG/school").text = str(spell_info["school"])
+		spellCard.get_node("BG/casingTime").text = str(spell_info["casting_time"])
 		
-		spellCard.rect_position = $position.position + Vector2(280 * (i), 0)
-		spellCard.rect_scale = Vector2(.8,.8)
-		$position.add_child(spellCard)
+		spellCard.rect_scale = Vector2(.4,.4)
+		pos.add_child(spellCard)
+		spellCard.set_name(spell_name)
 		var name = spellCard.name
-		spellCard.connect("mouse_entered",self,"onMouseEntered",[name,spell_name])
-		spellCard.connect("mouse_exited",self,"onMouseExited")
+		spellCard.get_node("button").connect("mouse_entered",self,"onMouseEntered",[name,spellCard])
+		spellCard.get_node("button").connect("mouse_exited",self,"onMouseExited",[name,spellCard])
+		spellCard.get_node("button").connect("pressed",self,"onPressed",[name,spellCard])
 		i += 1
 
 
-func onMouseEntered(name,spellName):
-	for i in $position.get_children():
-		if i is Control and i.name == name:
-			i.rect_scale = Vector2(1.5,1.5)
-			i.get_node("texture/description").clip_text = false
-			i.raise()
-	
-func onMouseExited():
-	for i in $position.get_children():
-		if i is Control:
-			i.rect_scale = Vector2(.8,.8)
-			i.get_node("texture/description").clip_text = true
+func onPressed(name,spellCard):
+	spellCard.rect_position = selectedCard.position
+
+func onMouseEntered(name,spellCard):
+	pass
+
+func onMouseExited(name,spellCard):
+	pass
+
+#

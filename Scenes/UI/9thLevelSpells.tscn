@@ -7,5 +7,16 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 1 )
 
-[node name="position" type="Node2D" parent="."]
-position = Vector2( 0, 60 )
+[node name="position" type="GridContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = 576.0
+margin_bottom = 440.0
+rect_scale = Vector2( 0.6, 0.6 )
+rect_pivot_offset = Vector2( 120, 100 )
+custom_constants/vseparation = 500
+custom_constants/hseparation = 380
+columns = 5
+
+[node name="selectedCard" type="Position2D" parent="."]
+position = Vector2( 878, 108 )

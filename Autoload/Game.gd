@@ -9,7 +9,7 @@ var selectedCharacter = ""
 # game mechanic vairables
 var TURN = ""
 var TURNINDEX = 0
-var ROUNDS
+var ROUNDS = 0
 var INITATIVE = []
 var TOTALINITIATIVE
 

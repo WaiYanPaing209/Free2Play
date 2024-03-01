@@ -1,6 +1,11 @@
-extends Control
+extends TextureButton
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
+func _ready():
+	$button.connect("mouse_entered",self,"entered")
+	$button.connect("pressed",self,"Onpressed")
+	
+func entered():
+	print("mouse entered")
+	
+func Onpressed():
+	print("is pressed!")

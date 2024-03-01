@@ -20,7 +20,9 @@ func _ready():
 	Game.connect("d20Result",self,"onShowResult")
 	roll.connect("pressed",self,"_on_roll_pressed")
 	rollWithAdvantage.connect("pressed",self,"_on_roll_with_advantage_pressed")
+# warning-ignore:return_value_discarded
 	connect("D20Result",self,"onD20Result")
+# warning-ignore:return_value_discarded
 	connect("advantageD20Result",self,"onAdvantageD20Result")
 	
 func clear():
