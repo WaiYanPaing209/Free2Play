@@ -16,6 +16,7 @@ var initiative
 var canMove = false
 var isMoving = false
 var attackRange = 20
+var toHit = 11
 
 func assignModifiers():
 	for i in stats.keys():

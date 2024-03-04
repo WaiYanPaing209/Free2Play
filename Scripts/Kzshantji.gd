@@ -9,7 +9,8 @@ var stats = {
 	"CHA" : []
 }
 
-
+var hitDie
+var hitPoint 
 var destinatedPos = Vector2.ZERO
 var initiative
 var speed = 30
@@ -17,6 +18,7 @@ var armorClass = 19
 var canMove = false
 var isMoving = false
 var attackRange = 60
+var toHit = 10
 
 func assignModifiers():
 	for i in stats.keys():

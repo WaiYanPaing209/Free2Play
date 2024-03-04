@@ -1,6 +1,7 @@
 extends Control
 
-onready var buttonPreload = preload("res://Scenes/Utility Scenes/button.tscn")
+onready var buttonPreload = preload("res://Scenes/Utility Scenes/textureButton.tscn")
+onready var whoToAttack = $bg/attackWho
 
 var number = null
 
@@ -11,8 +12,6 @@ func addButtons():
 	else:
 		for i in number:
 			var button = buttonPreload.instance()
-			button.get_node("RedDot").hide()
-			button.get_node("countLabel").hide()
 			$bg/Container.add_child(button)
 # Called when the node enters the scene tree for the first time.
 

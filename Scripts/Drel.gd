@@ -12,9 +12,11 @@ var stats = {
 var destinatedPos = Vector2.ZERO
 var initiative
 var speed = 30
+var armorClass = 11
 var canMove = false
 var isMoving = false
 var attackRange = 5
+var toHit = 7
 
 func assignModifiers():
 	for i in stats.keys():

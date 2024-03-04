@@ -13,15 +13,23 @@ var ROUNDS = 0
 var INITATIVE = []
 var TOTALINITIATIVE
 
+# UI singletons
+var RED = "#4ee22727"
+var GREEN = "#9d13582b"
+var NORMAL = "#4e160c0c"
+
 # roll outcomes
 var D20outcome
 
 # global signals
 # warning-ignore:unused_signal
 signal d20Result(result)
+# warning-ignore:unused_signal
+signal compareOutcomes(first,second)
 
 # character variables
-
+var first
+var second
 
 # methods
 func calculateModifier(score: Array):

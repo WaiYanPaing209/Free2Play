@@ -1,0 +1,6 @@
+[gd_scene format=2]
+
+[node name="D6" type="Sprite"]
+hframes = 6
+vframes = 5
+frame = 23

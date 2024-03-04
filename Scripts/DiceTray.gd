@@ -2,11 +2,14 @@ extends Control
 
 onready var outcomeLabel = $bg/outcome
 onready var roll = $bg/roll
+onready var rollD6 = $bg/rollD6
 onready var rollWithAdvantage = $bg/advantageRoll
 onready var D20 = $bg/D20
 onready var secondD20 = $bg/secondD20
 onready var dice1Animation = $bg/D20/AnimationPlayer
 onready var dice2Animation = $bg/secondD20/AnimationPlayer
+onready var modifierLabel = $bg/modifier
+onready var whoRolled = $bg/whoRolled
 
 signal D20Result(outcome)
 signal advantageD20Result(outcome)
@@ -14,14 +17,23 @@ signal advantageD20Result(outcome)
 var D20Outcome = null
 var secondD20Outcome = null
 var advantage = false
+var who
+var modifier
+var comparable
+var diceStatus
+
 
 func canRoll():
 	if advantage:
 		rollWithAdvantage.disabled = false
 		rollWithAdvantage.modulate = Color(1,1,1,1)
+		roll.disabled = true
+		roll.modulate = Color(1,1,1,.7)
 	else:
 		rollWithAdvantage.disabled = true
 		rollWithAdvantage.modulate = Color(1,1,1,.7)
+		roll.disabled = false
+		roll.modulate = Color(1,1,1,1)
 
 func _ready():
 	canRoll()
@@ -30,6 +42,7 @@ func _ready():
 	Game.connect("d20Result",self,"onShowResult")
 	roll.connect("pressed",self,"_on_roll_pressed")
 	rollWithAdvantage.connect("pressed",self,"_on_roll_with_advantage_pressed")
+	rollD6.connect("pressed",self,"onD6Pressed")
 # warning-ignore:return_value_discarded
 	connect("D20Result",self,"onD20Result")
 # warning-ignore:return_value_discarded
@@ -37,20 +50,33 @@ func _ready():
 	
 func clear():
 	outcomeLabel.hide()
+	modifierLabel.hide()
 	
-	
+func onD6Pressed():
+	randomize()
+	var num = round(rand_range(1,6))
+	print(num)
+
+
 func _on_roll_pressed():
 	clear()
 	dice1Animation.play("rolling")
-	D20.calculateOutcome()
+	diceStatus = D20.calculateOutcome()
 	var outcome = D20.outcome
+	var mod = modifier
 	secondD20.hide()
 	roll.disabled = true
 	roll.modulate = Color(1,1,1,.7)
 	yield(get_tree().create_timer(1.75), "timeout")
 	roll.disabled = false
 	roll.modulate = Color(1,1,1,1)
-	emit_signal("D20Result",outcome)
+	Game.D20outcome = outcome
+	Game.first = outcome + mod
+	Game.second = comparable
+	emit_signal("D20Result",outcome,mod)
+	Game.emit_signal("compareOutcomes",Game.first,Game.second)
+#	print(diceStatus)
+#	print(Game.first,Game.second)
 
 
 func _on_roll_with_advantage_pressed():
@@ -63,20 +89,27 @@ func _on_roll_with_advantage_pressed():
 	D20Outcome = D20.outcome  # Add this line
 	secondD20Outcome = secondD20.outcome  # Add this line
 	var outcome
+	var mod = modifier
 	if D20Outcome > secondD20Outcome:
 		outcome = D20Outcome
 	elif secondD20Outcome > D20Outcome:
 		outcome = secondD20Outcome
 	else:
 		outcome = secondD20Outcome
+
 	rollWithAdvantage.disabled = true
 	rollWithAdvantage.modulate = Color(1,1,1,.7)
 	yield(get_tree().create_timer(1.75), "timeout")
 	rollWithAdvantage.disabled = false
 	rollWithAdvantage.modulate = Color(1,1,1,1)
-	emit_signal("advantageD20Result",outcome)
+	Game.D20outcome = outcome
+	Game.first = outcome + mod
+	Game.second = comparable
+	emit_signal("advantageD20Result",outcome,mod)
+	Game.emit_signal("compareOutcomes",Game.first,Game.second)
 	
-func onAdvantageD20Result(outcome):
+func onD20Result(outcome,mod):
+#	print(diceStatus)
 	outcomeLabel.show()
 	if outcome != null:
 		outcomeLabel.text = str(outcome)
@@ -91,27 +124,42 @@ func onAdvantageD20Result(outcome):
 			outcomeLabel.set("custom_fonts/font", dynamic_font)
 	else:
 		outcomeLabel.text = ""
-	Game.D20outcome = outcome
+		
+	if mod != null:
+		modifierLabel.text = "+ " + str(mod)
+		modifierLabel.show()
+	yield(get_tree().create_timer(.8),"timeout")
+	outcomeLabel.text = str(outcome + mod)
+	modifierLabel.hide()
 	yield(get_tree().create_timer(2),"timeout")
 	hide()
-	
-func onD20Result(outcome):
-	outcomeLabel.show()
-	if outcome != null:
-		outcomeLabel.text = str(outcome)
-		var dynamic_font = DynamicFont.new()
-		if outcome >= 17:
-			dynamic_font.size = 60
-			dynamic_font.font_data = load("res://Assets/Fonts/Scaly Sans Caps.otf")
-			outcomeLabel.set("custom_fonts/font", dynamic_font)
-		else:
-			dynamic_font.size = 40
-			dynamic_font.font_data = load("res://Assets/Fonts/Scaly Sans Caps.otf")
-			outcomeLabel.set("custom_fonts/font", dynamic_font)
-	else:
-		outcomeLabel.text = ""
-	Game.D20outcome = outcome
-	yield(get_tree().create_timer(2),"timeout")
-	hide()
+	clear()
 
-	
+# warning-ignore:unused_argument
+func onAdvantageD20Result(outcome,mod):
+	outcomeLabel.show()
+	if outcome != null:
+		outcomeLabel.text = str(outcome)
+		var dynamic_font = DynamicFont.new()
+		if outcome >= 17:
+			dynamic_font.size = 60
+			dynamic_font.font_data = load("res://Assets/Fonts/Scaly Sans Caps.otf")
+			outcomeLabel.set("custom_fonts/font", dynamic_font)
+		else:
+			dynamic_font.size = 40
+			dynamic_font.font_data = load("res://Assets/Fonts/Scaly Sans Caps.otf")
+			outcomeLabel.set("custom_fonts/font", dynamic_font)
+	else:
+		outcomeLabel.text = ""
+	if mod != null:
+		modifierLabel.text = "+ " + str(mod)
+		modifierLabel.show()
+	yield(get_tree().create_timer(.8),"timeout")
+	outcomeLabel.text = str(outcome + mod)
+	modifierLabel.hide()
+	yield(get_tree().create_timer(2),"timeout")
+	hide()
+	clear()
+
+func _on_cancelButton_pressed():
+	hide()

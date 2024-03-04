@@ -59,18 +59,20 @@ func clearGrid():
 			
 func array_difference(array1: Array, array2: Array) -> Array:
 	var difference = []
-	if len(array1) >= len(array2):
+	if len(array1) > len(array2):
+#		print(len(array1)," is greather than ",len(array2))
 		for element in array1:
 			if not (element in array2):
 				difference.append(element)
-	else:
+	elif len(array2) > len(array1):
+#		print(len(array2)," is greater than 1",len(array1))
 		for element in array2:
 			if not (element in array1):
 				difference.append(element)
 	return difference
 
 # warning-ignore:shadowed_variable
-func modulateGrids(moveableGrid: Array, excludeGridName: String = "", gridType: String = ""):
+func modulateGrids(moveableGrid: Array, excludeGridName: String = "", gridType: String = "",color: String = ""):
 	for child in GRID.get_children():
 		if child is TextureButton:
 			match gridType:
@@ -78,13 +80,14 @@ func modulateGrids(moveableGrid: Array, excludeGridName: String = "", gridType: 
 					var gridNum = int(child.get_name()) + 1
 					if moveableGrid.find(gridNum) != -1:
 						if child.name != excludeGridName:
-							child.modulate = Color("#9d13582b")  # Modulate color for accessible grids
+							child.modulate = Color(color)  # Modulate color for accessible grids
 					else:
-						child.modulate = Color("#4e160c0c")  # Modulate color for non-accessible grids
+						child.modulate = Color(Game.NORMAL)  # Modulate color for non-accessible grids
 				"attack":
 					var gridNum = int(child.get_name()) + 1
 					if moveableGrid.find(gridNum) != -1:
-						child.modulate = Color("#4ee22727")
+						child.modulate = Color(color)
+					
 						
 
 # warning-ignore:shadowed_variable
@@ -109,8 +112,14 @@ func onPressed(grid, gridName):
 			moveableGrid = find_accessible_range(int(Game.gridPos), character.speed, Game.occupiedSpace)
 			attackGrid = find_accessible_range(int(Game.gridPos),character.attackRange,[])
 			gridDifference = array_difference(moveableGrid,attackGrid)
-			modulateGrids(gridDifference,"","move")
-			modulateGrids(attackGrid,"","attack")
+
+			if Game.TURN == "Kzshantji":
+				modulateGrids(moveableGrid,"","move",Game.GREEN)
+				modulateGrids(gridDifference,"","attack",Game.RED)
+			else:
+				modulateGrids(moveableGrid,"","move",Game.RED)
+				modulateGrids(gridDifference,"","attack",Game.GREEN)
+				
 			searchAttackRange()
 			selectedGrid = grid
 			isMoveable = moveableGrid.find(Game.gridPos) != -1
@@ -119,6 +128,9 @@ func onPressed(grid, gridName):
 		else:
 			debug.text = "Not the turn of " + Game.selectedCharacter
 			clearGrid()
+			attackableTargets.clear()
+			attackUI.removeButtons()
+			return
 
 	if is_pressed and not spawned and Game.selectedCharacter == Game.TURN:
 		spawned = true
@@ -129,16 +141,23 @@ func onPressed(grid, gridName):
 				break
 		if not isMoveable:
 			grid.modulate = Color("#db0051a7")
-			modulateGrids(moveableGrid, gridName,"move")
+			modulateGrids(moveableGrid, gridName,"move",Game.GREEN)
 
 func movePressed():
 	isMoveable = moveableGrid.find(Game.gridPos) != -1
 	if isMoveable:
+		moveableGrid.clear()
+		attackGrid.clear()
+		gridDifference.clear()
+		attackUI.removeButtons()
+		attackableTargets.clear()
+		clearGrid()
 #		controlPanel.hide()
 		for character in characters:
 			if Game.selectedCharacter == character.name and Game.selectedCharacter == Game.TURN:
 				match character.movement:
 					true:
+#						print(Game.gridPos)
 						character.startPos = character.position
 						character.move_to(Game.movePos + Vector2(20, 20)) # character offset
 						nameLabels.get_node(str(character.name)).hide()
@@ -151,10 +170,23 @@ func movePressed():
 					false:
 						debug.text = "No Movement Available"
 				
+				emit_signal("detectChanges")
+				refreshChanges()
+				moveableGrid = find_accessible_range(int(Game.gridPos), character.speed, Game.occupiedSpace)
+				attackGrid = find_accessible_range(int(Game.gridPos),character.attackRange,[])
+				gridDifference = array_difference(moveableGrid,attackGrid)
+				searchAttackRange()
+				if Game.TURN == "Kzshantji":
+					modulateGrids(moveableGrid,"","move",Game.GREEN)
+					modulateGrids(gridDifference,"","attack",Game.RED)
+				else:
+					modulateGrids(moveableGrid,"","move",Game.RED)
+					modulateGrids(gridDifference,"","attack",Game.GREEN)
+				
 	else:
 		debug.text = "Invalid Move!"
-	emit_signal("detectChanges")
-#	refreshChanges()
+	
+	
 	
 func checkActions():
 # warning-ignore:shadowed_variable
@@ -208,6 +240,7 @@ func _ready():
 	moveButton.connect("pressed", self, "movePressed")
 	attackButton.connect("pressed",self,"onAttackPressed")
 	okButton.connect("pressed",self,"onDonePressed")
+	
 	connect("detectChanges",self,"detectChanges")
 	connect("nextTurn",self,"onNextTurn")
 		
@@ -220,15 +253,12 @@ func _ready():
 	initializeGame()
 	
 func onAttackPressed():
-	isAttackable = attackGrid.find(Game.gridPos) != 1
-	if isAttackable:
-		for character in characters:
-			if Game.selectedCharacter == character.name and Game.selectedCharacter == Game.TURN:
-				character.action = false
-		refreshChanges()
-		attackableTargets.clear()
-		attackUI.removeButtons()
-		emit_signal("detectChanges")
+#	print(attackableTargets)
+	attackableTargets.clear()
+	if attackUI.visible == true:
+		attackUI.hide()
+	else:
+		attackUI.show()
 
 func onDonePressed():
 	emit_signal("nextTurn")
@@ -266,12 +296,14 @@ func onNextTurn():
 		Game.ROUNDS += 1
 	refreshChanges()
 	clearGrid()
+	
 		
 
 func refreshChanges():
 	turn.text = str(Game.TURN) + "'s Turn"
 #	debug.text = ""
 	rounds.text = "Rounds : " + str(Game.ROUNDS)
+	diceTray.whoRolled.text = str(Game.TURN)
 	controlPanel.get_node("Turn").text = str(Game.TURN) + " 's Control Panel"
 	controlPanel.get_node("Action").text = "Action : " + str(int(Game.INITATIVE[int(Game.TURNINDEX)].action))
 	controlPanel.get_node("bonusAction").text = "Bonus Action : " + str(int(Game.INITATIVE[int(Game.TURNINDEX)].bonusAction))
@@ -286,6 +318,7 @@ func refreshChanges():
 		else:
 			label.add_color_override("font_color", Color(1, 1, 1, 1)) 
 			label.rect_scale = Vector2(1,1)
+	
 
 func find_accessible_range(selected_number: int, movementRange: int, ignore_numbers: Array) -> Array:
 	var accessible_numbers: Array = []
@@ -308,7 +341,6 @@ func find_accessible_range(selected_number: int, movementRange: int, ignore_numb
 # warning-ignore:unused_argument
 # warning-ignore:unused_argument
 func searchAttackRange():
-#	print(attackGrid)
 	var index = attackGrid.size()
 	for i in range(index):
 		var grid = attackGrid[i]
@@ -321,23 +353,62 @@ func searchAttackRange():
 	attackUI.addButtons()
 	var buttonIndex = 0
 	for k in attackUI.get_node("bg/Container").get_children():
-		if k is Button:
+		if k is TextureButton:
 			if buttonIndex < attackableTargets.size():
 				k.set_name(str(attackableTargets[buttonIndex]))
 			if k.is_connected("pressed",self,"onUIAttackPressed"):
 				k.disconnect("pressed",self,"onUIAttackPressed")
 			k.connect("pressed",self,"onUIAttackPressed",[k.name])
 			if buttonIndex < attackableTargets.size():
-				k.text = attackableTargets[buttonIndex]
+				k.get_node("name").text = str(attackableTargets[buttonIndex])
 				buttonIndex += 1
 	attackUI.show()
-	print(attackableTargets)
+
 
 func onUIAttackPressed(name):
+	isAttackable = attackGrid.find(Game.gridPos) != 1
+	if isAttackable:
+# warning-ignore:shadowed_variable
+		for character in characters:
+			if Game.selectedCharacter == character.name and Game.selectedCharacter == Game.TURN:
+				character.action = false
+		refreshChanges()
+		attackableTargets.clear()
+		attackUI.removeButtons()
+		attackUI.hide()
+		emit_signal("detectChanges")
 	attackableTargets.clear()
 	attackUI.removeButtons()
 	diceTray.show()
+#	diceTray.advantage = true
+#	diceTray.canRoll()
+	attackUI.hide()
+	diceTray.modifier = characters[Game.TURNINDEX].toHit
+	var toAttack = GRID.get_node(str(name))
+	diceTray.comparable = str(toAttack.armorClass)
 	
+#	print(str(toAttack.armorClass))
+# warning-ignore:return_value_discarded
+	if Game.is_connected("compareOutcomes",self,"compareOutcomes"):
+		Game.disconnect("compareOutcomes",self,"compareOutcomes")
+	Game.connect("compareOutcomes",self,"compareOutcomes")
+
+#	print(str(diceTray.who) + " attempts to hit " + str(name))
+#	print(Game.D20outcome, " + ",str(characters[Game.TURNINDEX].toHit))
+
+
+func compareOutcomes(first, second):
+# warning-ignore:unused_variable
+	var result
+	if int(first) >= int(second):
+		diceTray.whoRolled.text = "HIT!!"
+	if diceTray.diceStatus["critical"]:
+		diceTray.whoRolled.text = "CRITCAL HIT!!"
+	if int(second) > int(first):
+		diceTray.whoRolled.text = "MISS!"
+	if diceTray.diceStatus["failure"]:
+		diceTray.whoRolled.text = "CRITCAL FAIL!!"
+
 func findOccupiedSpace():
 	Game.occupiedSpace.clear()
 	for child in GRID.get_children():
@@ -363,6 +434,7 @@ func nextTurn():
 	else:
 		Game.TURN = Game.INITATIVE[current_index + 1].name
 	turn.text = str(Game.TURN) + "'s Turn"
+	diceTray.whoRolled.text = str(Game.TURN)
 	for i in range(initiateGrid.get_child_count()):
 		var label = initiateGrid.get_child(i)
 		if label.text == Game.TURN:
@@ -376,7 +448,9 @@ func initializeGame():
 	Game.INITATIVE = characters
 	Game.TURN = characters[Game.TURNINDEX].name
 	Game.TOTALINITIATIVE = Game.INITATIVE.size() - 1 # to match with array index
+	diceTray.who = Game.TURN
 	turn.text = str(Game.TURN) + "'s Turn"
+	diceTray.get_node("bg/whoRolled").text = str(diceTray.who)
 	rounds.text = "Rounds : " + str(Game.ROUNDS)
 	
 	for i in Game.INITATIVE.size():
