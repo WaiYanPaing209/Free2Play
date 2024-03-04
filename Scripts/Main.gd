@@ -34,6 +34,8 @@ var gridDifference = []
 var attackableTargets = []
 var gridSceneInstance = null
 var gridRange = 5
+var turnGrid
+var turnNode = null
 var columns
 var rows
 var area
@@ -94,6 +96,7 @@ func modulateGrids(moveableGrid: Array, excludeGridName: String = "", gridType: 
 # warning-ignore:unused_argument
 # warning-ignore:shadowed_variable
 func onPressed(grid, gridName):
+	var searchedAttackRange = false
 	is_pressed = true
 	Game.movePos = grid.rect_position
 	Game.gridPos = int(gridName) + 1
@@ -146,12 +149,6 @@ func onPressed(grid, gridName):
 func movePressed():
 	isMoveable = moveableGrid.find(Game.gridPos) != -1
 	if isMoveable:
-		moveableGrid.clear()
-		attackGrid.clear()
-		gridDifference.clear()
-		attackUI.removeButtons()
-		attackableTargets.clear()
-		clearGrid()
 #		controlPanel.hide()
 		for character in characters:
 			if Game.selectedCharacter == character.name and Game.selectedCharacter == Game.TURN:
@@ -165,6 +162,14 @@ func movePressed():
 						character.z_index = 0
 						nameLabels.get_node(str(character.name)).rect_position = Game.movePos + Vector2(40, 30)# label offset
 						nameLabels.get_node(str(character.name)).show() 
+						moveableGrid.clear()
+						attackGrid.clear()
+						gridDifference.clear()
+						attackUI.removeButtons()
+						moveableGrid = find_accessible_range(int(Game.gridPos), character.speed, Game.occupiedSpace)
+						attackGrid = find_accessible_range(int(Game.gridPos),character.attackRange,[])
+						gridDifference = array_difference(moveableGrid,attackGrid)
+						searchAttackRange()
 						clearGrid()
 						character.movement = false
 					false:
@@ -172,10 +177,7 @@ func movePressed():
 				
 				emit_signal("detectChanges")
 				refreshChanges()
-				moveableGrid = find_accessible_range(int(Game.gridPos), character.speed, Game.occupiedSpace)
-				attackGrid = find_accessible_range(int(Game.gridPos),character.attackRange,[])
-				gridDifference = array_difference(moveableGrid,attackGrid)
-				searchAttackRange()
+				
 				if Game.TURN == "Kzshantji":
 					modulateGrids(moveableGrid,"","move",Game.GREEN)
 					modulateGrids(gridDifference,"","attack",Game.RED)
@@ -286,6 +288,7 @@ func _compareInitiative(a, b):
 func onNextTurn():
 	attackableTargets.clear()
 	attackUI.removeButtons()
+	
 	if Game.TURNINDEX < Game.TOTALINITIATIVE:
 		Game.TURNINDEX += 1
 		Game.TURN = Game.INITATIVE[Game.TURNINDEX].name
@@ -294,8 +297,13 @@ func onNextTurn():
 		Game.TURNINDEX = 0
 		Game.TURN = Game.INITATIVE[Game.TURNINDEX].name
 		Game.ROUNDS += 1
+	turnGrid = Game.wholeGrid[characters[Game.TURNINDEX].position - Vector2(20,20)]
+	turnGrid = turnGrid + 1
+	turnNode = GRID.get_node(str(int(turnGrid - 1)))
+	yield(get_tree().create_timer(.6),"timeout")
+	turnNode.emit_signal("pressed")
 	refreshChanges()
-	clearGrid()
+#	clearGrid()
 	
 		
 
@@ -362,7 +370,7 @@ func searchAttackRange():
 			if buttonIndex < attackableTargets.size():
 				k.get_node("name").text = str(attackableTargets[buttonIndex])
 				buttonIndex += 1
-	attackUI.show()
+#	attackUI.show()
 
 
 func onUIAttackPressed(name):
@@ -468,6 +476,18 @@ func initializeGame():
 			label.set_name(j.name)
 			label.rect_position = j.global_position + Vector2(-20,-35)
 			nameLabels.add_child(label)
+			
+	for k in GRID.get_children():
+		if k is TextureButton:
+			Game.wholeGrid[k.rect_position] = int(k.name)
+#	print(Game.wholeGrid)
+	turnGrid = Game.wholeGrid[characters[Game.TURNINDEX].position - Vector2(20,20)]
+	turnGrid = turnGrid + 1
+#	print("grid: ",turnGrid)
+#	print(characters[Game.TURNINDEX].position - Vector2(20,20))
+	turnNode = GRID.get_node(str(int(turnGrid - 1)))
+	yield(get_tree().create_timer(.6),"timeout")
+	turnNode.emit_signal("pressed")
 		
 	
 	

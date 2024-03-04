@@ -28,16 +28,16 @@ margin_left = 15.0
 margin_top = 18.0
 margin_right = 671.0
 margin_bottom = 492.0
-columns = 18
+columns = 12
 
 [node name="Kzshantji" parent="Grid" instance=ExtResource( 1 )]
-position = Vector2( 64, 64 )
+position = Vector2( 64, 20 )
 
 [node name="Zonshra" parent="Grid" instance=ExtResource( 3 )]
-position = Vector2( 152, 20 )
+position = Vector2( 20, 64 )
 
 [node name="Drel" parent="Grid" instance=ExtResource( 3 )]
-position = Vector2( 241, 21 )
+position = Vector2( 240, 20 )
 script = ExtResource( 6 )
 
 [node name="Jex" parent="Grid" instance=ExtResource( 5 )]

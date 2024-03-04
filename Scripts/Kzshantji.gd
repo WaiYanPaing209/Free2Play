@@ -20,6 +20,8 @@ var isMoving = false
 var attackRange = 60
 var toHit = 10
 
+var gridIndex : int = -1
+
 func assignModifiers():
 	for i in stats.keys():
 		var score = stats[i]
