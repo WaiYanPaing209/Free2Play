@@ -31,7 +31,6 @@ var overlappingBodies = []
 var moveableGrid = []
 var attackGrid = []
 var gridDifference = []
-var attackableTargets = []
 var gridSceneInstance = null
 var gridRange = 5
 var turnGrid
@@ -96,12 +95,12 @@ func modulateGrids(moveableGrid: Array, excludeGridName: String = "", gridType: 
 # warning-ignore:unused_argument
 # warning-ignore:shadowed_variable
 func onPressed(grid, gridName):
+# warning-ignore:unused_variable
 	var searchedAttackRange = false
 	is_pressed = true
 	Game.movePos = grid.rect_position
 	Game.gridPos = int(gridName) + 1
 	emit_signal("detectChanges")
-
 	var zone = grid.get_node("detectionZone")
 	overlappingBodies = zone.get_overlapping_bodies()
 	if overlappingBodies.size() > 0:
@@ -122,7 +121,7 @@ func onPressed(grid, gridName):
 			else:
 				modulateGrids(moveableGrid,"","move",Game.RED)
 				modulateGrids(gridDifference,"","attack",Game.GREEN)
-				
+			
 			searchAttackRange()
 			selectedGrid = grid
 			isMoveable = moveableGrid.find(Game.gridPos) != -1
@@ -131,8 +130,6 @@ func onPressed(grid, gridName):
 		else:
 			debug.text = "Not the turn of " + Game.selectedCharacter
 			clearGrid()
-			attackableTargets.clear()
-			attackUI.removeButtons()
 			return
 
 	if is_pressed and not spawned and Game.selectedCharacter == Game.TURN:
@@ -165,7 +162,6 @@ func movePressed():
 						moveableGrid.clear()
 						attackGrid.clear()
 						gridDifference.clear()
-						attackUI.removeButtons()
 						moveableGrid = find_accessible_range(int(Game.gridPos), character.speed, Game.occupiedSpace)
 						attackGrid = find_accessible_range(int(Game.gridPos),character.attackRange,[])
 						gridDifference = array_difference(moveableGrid,attackGrid)
@@ -256,7 +252,7 @@ func _ready():
 	
 func onAttackPressed():
 #	print(attackableTargets)
-	attackableTargets.clear()
+	Game.attackableTargets.clear()
 	if attackUI.visible == true:
 		attackUI.hide()
 	else:
@@ -286,9 +282,8 @@ func _compareInitiative(a, b):
 
 
 func onNextTurn():
-	attackableTargets.clear()
+	Game.attackableTargets.clear()
 	attackUI.removeButtons()
-	
 	if Game.TURNINDEX < Game.TOTALINITIATIVE:
 		Game.TURNINDEX += 1
 		Game.TURN = Game.INITATIVE[Game.TURNINDEX].name
@@ -309,10 +304,12 @@ func onNextTurn():
 
 func refreshChanges():
 	turn.text = str(Game.TURN) + "'s Turn"
-#	debug.text = ""
 	rounds.text = "Rounds : " + str(Game.ROUNDS)
 	diceTray.whoRolled.text = str(Game.TURN)
-	controlPanel.get_node("Turn").text = str(Game.TURN) + " 's Control Panel"
+	controlPanel.get_node("InfoUI").get_node("Turn").text = str(Game.TURN)
+	controlPanel.get_node("InfoUI").get_node("hitPoint").text = "Hit Points " + str(int(Game.INITATIVE[int(Game.TURNINDEX)].hitPoint))
+	controlPanel.get_node("InfoUI").get_node("armorClass").text = "Armor Class " + str(int(Game.INITATIVE[int(Game.TURNINDEX)].armorClass))
+	controlPanel.get_node("InfoUI").get_node("speed").text = "Speed " + str(int(Game.INITATIVE[int(Game.TURNINDEX)].speed))
 	controlPanel.get_node("Action").text = "Action : " + str(int(Game.INITATIVE[int(Game.TURNINDEX)].action))
 	controlPanel.get_node("bonusAction").text = "Bonus Action : " + str(int(Game.INITATIVE[int(Game.TURNINDEX)].bonusAction))
 	controlPanel.get_node("movement").text = "Movement : " + str(int(Game.INITATIVE[int(Game.TURNINDEX)].movement))
@@ -349,6 +346,8 @@ func find_accessible_range(selected_number: int, movementRange: int, ignore_numb
 # warning-ignore:unused_argument
 # warning-ignore:unused_argument
 func searchAttackRange():
+	Game.attackableTargets.clear()
+	attackUI.removeButtons()
 	var index = attackGrid.size()
 	for i in range(index):
 		var grid = attackGrid[i]
@@ -356,22 +355,19 @@ func searchAttackRange():
 		overlappingBodies = node.get_overlapping_bodies()
 		if overlappingBodies.size() > 0:
 			for ii in overlappingBodies:
-				attackableTargets.append(ii.name)
-	attackUI.number = attackableTargets.size()
+				Game.attackableTargets.append(ii.name)
+				
+	print(len(Game.attackableTargets)," ",Game.attackableTargets)
 	attackUI.addButtons()
-	var buttonIndex = 0
+	print("-------")
+
+	print(attackUI.get_node("bg/Container").get_children())
 	for k in attackUI.get_node("bg/Container").get_children():
 		if k is TextureButton:
-			if buttonIndex < attackableTargets.size():
-				k.set_name(str(attackableTargets[buttonIndex]))
 			if k.is_connected("pressed",self,"onUIAttackPressed"):
 				k.disconnect("pressed",self,"onUIAttackPressed")
 			k.connect("pressed",self,"onUIAttackPressed",[k.name])
-			if buttonIndex < attackableTargets.size():
-				k.get_node("name").text = str(attackableTargets[buttonIndex])
-				buttonIndex += 1
-#	attackUI.show()
-
+			
 
 func onUIAttackPressed(name):
 	isAttackable = attackGrid.find(Game.gridPos) != 1
@@ -379,21 +375,22 @@ func onUIAttackPressed(name):
 # warning-ignore:shadowed_variable
 		for character in characters:
 			if Game.selectedCharacter == character.name and Game.selectedCharacter == Game.TURN:
-				character.action = false
+				match character.action:
+					true:
+						diceTray.show()
+						attackUI.hide()
+						diceTray.modifier = characters[Game.TURNINDEX].toHit
+						var toAttack = GRID.get_node(str(name))
+						print(toAttack)
+						diceTray.comparable = str(toAttack.armorClass)
+						character.action = false
+					false:
+						debug.text = "No Attack Available!"
+						return
 		refreshChanges()
-		attackableTargets.clear()
-		attackUI.removeButtons()
+		Game.attackableTargets.clear()
 		attackUI.hide()
 		emit_signal("detectChanges")
-	attackableTargets.clear()
-	attackUI.removeButtons()
-	diceTray.show()
-#	diceTray.advantage = true
-#	diceTray.canRoll()
-	attackUI.hide()
-	diceTray.modifier = characters[Game.TURNINDEX].toHit
-	var toAttack = GRID.get_node(str(name))
-	diceTray.comparable = str(toAttack.armorClass)
 	
 #	print(str(toAttack.armorClass))
 # warning-ignore:return_value_discarded
@@ -434,8 +431,7 @@ func detectChanges():
 	
 func nextTurn():
 	var current_index = Game.INITATIVE.find(Game.TURN)
-	attackableTargets.clear()
-	attackUI.removeButtons()
+	Game.attackableTargets.clear()
 	if current_index == Game.INITATIVE.size() - 1:
 		Game.TURN = Game.INITATIVE[0].name
 		rounds.text = str(int(rounds.text) + 1)

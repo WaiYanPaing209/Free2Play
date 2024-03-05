@@ -28,7 +28,7 @@ margin_left = 15.0
 margin_top = 18.0
 margin_right = 671.0
 margin_bottom = 492.0
-columns = 12
+columns = 18
 
 [node name="Kzshantji" parent="Grid" instance=ExtResource( 1 )]
 position = Vector2( 64, 20 )

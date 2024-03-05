@@ -9,12 +9,12 @@ size = 20
 use_filter = true
 font_data = ExtResource( 1 )
 
-[sub_resource type="DynamicFont" id=2]
+[sub_resource type="DynamicFont" id=3]
+size = 20
 use_filter = true
 font_data = ExtResource( 1 )
 
-[sub_resource type="DynamicFont" id=3]
-size = 20
+[sub_resource type="DynamicFont" id=2]
 use_filter = true
 font_data = ExtResource( 1 )
 
@@ -24,8 +24,8 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 margin_left = -512.0
-margin_top = -179.0
-margin_right = 510.0
+margin_top = -176.0
+margin_right = 512.0
 mouse_filter = 2
 color = Color( 0.141176, 0.141176, 0.141176, 0.654902 )
 
@@ -71,17 +71,6 @@ margin_bottom = 80.5
 custom_fonts/font = SubResource( 1 )
 text = "End Turn"
 
-[node name="Turn" type="Label" parent="."]
-anchor_left = 1.0
-anchor_right = 1.0
-margin_left = -222.0
-margin_top = 19.0
-margin_right = -49.0
-margin_bottom = 38.0
-custom_fonts/font = SubResource( 2 )
-text = "null"
-align = 1
-
 [node name="Undo" type="Button" parent="."]
 anchor_left = 0.5
 anchor_top = 0.5
@@ -93,3 +82,43 @@ margin_right = -301.0
 margin_bottom = 17.5
 custom_fonts/font = SubResource( 3 )
 text = "Undo"
+
+[node name="InfoUI" type="ColorRect" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -255.0
+margin_top = 9.0
+margin_right = -7.0
+margin_bottom = 169.0
+color = Color( 0.0784314, 0.0784314, 0.0784314, 1 )
+
+[node name="Turn" type="Label" parent="InfoUI"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -104.5
+margin_top = -68.5
+margin_right = 104.5
+margin_bottom = -49.5
+custom_fonts/font = SubResource( 2 )
+text = "null"
+align = 1
+
+[node name="armorClass" parent="InfoUI" instance=ExtResource( 2 )]
+margin_left = 6.0
+margin_top = 34.0
+margin_right = 46.0
+margin_bottom = 49.0
+
+[node name="hitPoint" parent="InfoUI" instance=ExtResource( 2 )]
+margin_left = 6.0
+margin_top = 54.0
+margin_right = 46.0
+margin_bottom = 69.0
+
+[node name="speed" parent="InfoUI" instance=ExtResource( 2 )]
+margin_left = 6.0
+margin_top = 72.0
+margin_right = 46.0
+margin_bottom = 87.0

@@ -4,6 +4,7 @@ var movePos = Vector2(0,0)
 var gridPos 
 var shiftSpeed = 1000
 var occupiedSpace = []
+var attackableTargets = []
 var wholeGrid = {}
 var selectedCharacter = ""
 

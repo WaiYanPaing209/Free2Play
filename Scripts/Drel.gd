@@ -9,6 +9,7 @@ var stats = {
 	"CHA" : []
 }
 
+var hitPoint = 180
 var destinatedPos = Vector2.ZERO
 var initiative
 var speed = 30

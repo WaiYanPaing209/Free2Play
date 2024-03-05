@@ -9,6 +9,7 @@ var stats = {
 	"CHA" : [12]
 }
 
+var hitPoint = 220
 var destinatedPos = Vector2.ZERO
 var speed = 35
 var armorClass = 21

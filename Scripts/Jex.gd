@@ -10,6 +10,7 @@ var stats = {
 }
 
 var destinatedPos = Vector2.ZERO
+var hitPoint = 100
 var initiative
 var speed = 30
 var armorClass = 15

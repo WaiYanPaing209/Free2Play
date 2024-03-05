@@ -10,7 +10,7 @@ var stats = {
 }
 
 var hitDie
-var hitPoint 
+var hitPoint = 227
 var destinatedPos = Vector2.ZERO
 var initiative
 var speed = 30
