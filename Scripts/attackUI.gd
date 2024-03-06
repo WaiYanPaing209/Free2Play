@@ -32,29 +32,32 @@ func addButtons():
 		
 	
 func onButtonsChanged():
+	var foundCharacters = []
 	if buttons == []:
 		initializeButtons()
-	print("buttons reinitialized: ",buttons," Attackable Targets: ",Game.attackableTargets)
+#	print("buttons reinitialized: ",buttons," Attackable Targets: ",Game.attackableTargets)
 	if Game.attackableTargets == []:
 		print("it becomes null")
 		for i in $bg/Container.get_children():
 			i.disabled = true
 			i.modulate = Color(.7,.7,.7,.7)
 		return
+
 	for j in range(len(Game.attackableTargets)):
 		var find = buttons[j].name.find(Game.attackableTargets[j]) != 1
 		if find:
 			var name = Game.attackableTargets[j]
 			var node = $bg/Container.get_node(str(name))
-			print("found :",node)
+			foundCharacters.append(node)
 			node.disabled = false
 			node.modulate = Color(1,1,1,1)
-		else:
-			var name = Game.attackableTargets[j]
-			var node = $bg/Container.get_node(str(name))
-			node.disabled = true
-			node.modulate = Color(.7,.7,.7,.7)
-	print("buttons :",$bg/Container.get_children())
+			
+	for k in $bg/Container.get_children():
+		if not foundCharacters.has(k):
+			k.disabled = true
+			k.modulate = Color(.6,.6,.6,.6)
+
+#	print("buttons :",$bg/Container.get_children())
 
 func removeButtons():
 	for i in $bg/Container.get_children():

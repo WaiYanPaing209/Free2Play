@@ -311,7 +311,7 @@ func onNextTurn():
 func refreshChanges():
 	turn.text = str(Game.TURN) + "'s Turn"
 	rounds.text = "Rounds : " + str(Game.ROUNDS)
-	diceTray.whoRolled.text = str(Game.TURN)
+#	diceTray.whoRolled.text = str(Game.TURN)
 	controlPanel.get_node("InfoUI").get_node("Turn").text = str(Game.TURN)
 	controlPanel.get_node("InfoUI").get_node("hitPoint").text = "Hit Points " + str(int(Game.INITATIVE[int(Game.TURNINDEX)].hitPoint))
 	controlPanel.get_node("InfoUI").get_node("armorClass").text = "Armor Class " + str(int(Game.INITATIVE[int(Game.TURNINDEX)].armorClass))
@@ -381,10 +381,11 @@ func onUIAttackPressed(name):
 			if Game.selectedCharacter == character.name and Game.selectedCharacter == Game.TURN:
 				match character.action:
 					true:
-						diceTray.show()
-						attackUI.hide()
 						diceTray.modifier = characters[Game.TURNINDEX].toHit
 						var toAttack = GRID.get_node(str(name))
+						diceTray.whoRolled.text = str(Game.TURN) + " attempts to hit " + str(toAttack.name)
+						diceTray.show()
+						attackUI.hide()
 						print(toAttack)
 						diceTray.comparable = str(toAttack.armorClass)
 						character.action = false

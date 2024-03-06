@@ -6,7 +6,7 @@
 [node name="textureButton" type="TextureButton"]
 margin_right = 80.0
 margin_bottom = 80.0
-rect_min_size = Vector2( 80, 80 )
+rect_min_size = Vector2( 100, 100 )
 texture_normal = ExtResource( 1 )
 expand = true
 stretch_mode = 4

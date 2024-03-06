@@ -103,10 +103,10 @@ text = "Roll D6"
 [node name="whoRolled" type="Label" parent="bg"]
 anchor_left = 0.5
 anchor_right = 0.5
-margin_left = -84.5
-margin_top = 31.0
-margin_right = 84.5
-margin_bottom = 64.0
+margin_left = -405.0
+margin_top = 15.0
+margin_right = 386.0
+margin_bottom = 48.0
 custom_fonts/font = SubResource( 1 )
 text = "Who Rolled"
 align = 1

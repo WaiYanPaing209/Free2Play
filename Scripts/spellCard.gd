@@ -1,11 +1,11 @@
 extends TextureButton
+class_name SpellCard
 
-func _ready():
-	$button.connect("mouse_entered",self,"entered")
-	$button.connect("pressed",self,"Onpressed")
-	
-func entered():
-	print("mouse entered")
-	
-func Onpressed():
-	print("is pressed!")
+var LEVEL
+var NAME
+var COMPONENTS
+var SCHOOL
+var RANGE
+var CASTINGTIME
+var DURATION
+var DESCRIPTION

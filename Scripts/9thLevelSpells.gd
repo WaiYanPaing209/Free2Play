@@ -1,18 +1,23 @@
 extends Control
 
 onready var spellCardPreload = preload("res://Scenes/spellCards/spellCard.tscn")
+onready var labelPreload = preload("res://Scenes/Utility Scenes/Label.tscn")
 onready var spellCard = spellCardPreload.instance()
 
 onready var pos = $bgPanel/node
 onready var selectedCard = $selectedCard
-onready var button = $bgPanel/Move
+onready var use = $bgPanel/use
 
 onready var cardOriginalPos
-const posArr = []
+var label
+
+const cardPos = {}
+
 onready var cards = []
 
 func _ready():
-	button.connect("pressed",self,"onButtonPressed")
+#	OS.window_fullscreen = true
+	use.connect("pressed",self,"onButtonPressed")
 	var i = 0
 	for spell_name in JsonData.ninethLevelSpells.keys():
 		spellCard = spellCardPreload.instance()
@@ -35,31 +40,42 @@ func _ready():
 		cardOriginalPos = spellCard.rect_position
 		cards.append(spellCard)
 		pos.add_child(spellCard)
-		posArr.append(cardOriginalPos)
 		spellCard.set_name(spell_name)
 		var name = spellCard.name
+		cardPos[name] = Vector2(cardOriginalPos)
 		spellCard.get_node("button").connect("mouse_entered",self,"onMouseEntered",[name,spellCard])
 		spellCard.get_node("button").connect("mouse_exited",self,"onMouseExited",[name,spellCard])
 		spellCard.get_node("button").connect("pressed",self,"onPressed",[name,spellCard])
 		i += 1
+#	print(cardPos)
+	label = labelPreload.instance()
+	label.rect_position = get_global_mouse_position()
+	add_child(label)
+	label.hide()
 
 func onButtonPressed():
-	var i = 0
-	for card in pos.get_children():
-		if card is TextureButton: 
-			card.rect_position = Vector2(posArr[i])
-			card.get_node("GlowBoarder").hide()
-		i += 1
-#	print(cards[6].name)
+	print("Casting Spell")
 
 func onPressed(name, spellCard):
-	spellCard.get_node("GlowBoarder").show()
-	spellCard.rect_position = selectedCard.rect_position
+	if spellCard.rect_position == selectedCard.rect_global_position:
+		# If the card is currently at the selected position, return it to the original position
+		spellCard.rect_position = cardPos[name]
+		spellCard.get_node("GlowBoarder").hide()
+	else:
+		# If the card is not at the selected position, move it to the selected position
+		spellCard.rect_position = selectedCard.rect_global_position
+		spellCard.get_node("GlowBoarder").show()
+
 
 
 func onMouseEntered(name,spellCard):
 	spellCard.rect_scale = Vector2(.6,.6)
+	label.show()
+	label.text = str(name)
+	label.rect_position = get_local_mouse_position()
+	
 
 func onMouseExited(name,spellCard):
 	spellCard.rect_scale = Vector2(.5,.5)
+	label.hide()
 #
