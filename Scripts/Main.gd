@@ -43,6 +43,7 @@ var height = 0
 var selected = false
 var selectedGrid = null
 var is_pressed = false
+var searchedAttackRange = false
 var isMoveable
 var isAttackable
 var speedDefault = 30
@@ -96,7 +97,6 @@ func modulateGrids(moveableGrid: Array, excludeGridName: String = "", gridType: 
 # warning-ignore:shadowed_variable
 func onPressed(grid, gridName):
 # warning-ignore:unused_variable
-	var searchedAttackRange = false
 	is_pressed = true
 	Game.movePos = grid.rect_position
 	Game.gridPos = int(gridName) + 1
@@ -123,6 +123,9 @@ func onPressed(grid, gridName):
 				modulateGrids(gridDifference,"","attack",Game.GREEN)
 			
 			searchAttackRange()
+			attackUI.addButtons()
+			print("-------")
+			connectButtons()
 			selectedGrid = grid
 			isMoveable = moveableGrid.find(Game.gridPos) != -1
 			refreshChanges()
@@ -142,6 +145,9 @@ func onPressed(grid, gridName):
 		if not isMoveable:
 			grid.modulate = Color("#db0051a7")
 			modulateGrids(moveableGrid, gridName,"move",Game.GREEN)
+
+#func _process(delta):
+#	print(Game.attackableTargets)
 
 func movePressed():
 	isMoveable = moveableGrid.find(Game.gridPos) != -1
@@ -166,6 +172,8 @@ func movePressed():
 						attackGrid = find_accessible_range(int(Game.gridPos),character.attackRange,[])
 						gridDifference = array_difference(moveableGrid,attackGrid)
 						searchAttackRange()
+						attackUI.refreshButtons()
+						connectButtons()
 						clearGrid()
 						character.movement = false
 					false:
@@ -282,7 +290,10 @@ func _compareInitiative(a, b):
 
 
 func onNextTurn():
-	Game.attackableTargets.clear()
+	if attackUI.buttons == []:
+		attackUI.initializeButtons()
+	print("buttons: ",attackUI.buttons)
+#	Game.attackableTargets.clear()
 	attackUI.removeButtons()
 	if Game.TURNINDEX < Game.TOTALINITIATIVE:
 		Game.TURNINDEX += 1
@@ -358,9 +369,9 @@ func searchAttackRange():
 				Game.attackableTargets.append(ii.name)
 				
 	print(len(Game.attackableTargets)," ",Game.attackableTargets)
-	attackUI.addButtons()
-	print("-------")
-
+	
+	
+func connectButtons():
 	print(attackUI.get_node("bg/Container").get_children())
 	for k in attackUI.get_node("bg/Container").get_children():
 		if k is TextureButton:
@@ -388,7 +399,6 @@ func onUIAttackPressed(name):
 						debug.text = "No Attack Available!"
 						return
 		refreshChanges()
-		Game.attackableTargets.clear()
 		attackUI.hide()
 		emit_signal("detectChanges")
 	
@@ -429,22 +439,6 @@ func detectChanges():
 	findOccupiedSpace()
 	checkActions()
 	
-func nextTurn():
-	var current_index = Game.INITATIVE.find(Game.TURN)
-	Game.attackableTargets.clear()
-	if current_index == Game.INITATIVE.size() - 1:
-		Game.TURN = Game.INITATIVE[0].name
-		rounds.text = str(int(rounds.text) + 1)
-	else:
-		Game.TURN = Game.INITATIVE[current_index + 1].name
-	turn.text = str(Game.TURN) + "'s Turn"
-	diceTray.whoRolled.text = str(Game.TURN)
-	for i in range(initiateGrid.get_child_count()):
-		var label = initiateGrid.get_child(i)
-		if label.text == Game.TURN:
-			label.add_color_override("font_color", Color(1, 0, 0, 1))  # Change font color to red
-		else:
-			label.add_color_override("font_color", Color(0, 0, 0, 0))  # Change font color to black
 
 func initializeGame():
 	controlPanel.hide()
@@ -456,7 +450,8 @@ func initializeGame():
 	turn.text = str(Game.TURN) + "'s Turn"
 	diceTray.get_node("bg/whoRolled").text = str(diceTray.who)
 	rounds.text = "Rounds : " + str(Game.ROUNDS)
-	
+	attackUI.initializeButtons()
+
 	for i in Game.INITATIVE.size():
 		var label = labelPreload.instance()
 		var name = Game.INITATIVE[i].name

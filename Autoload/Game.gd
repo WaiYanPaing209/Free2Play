@@ -19,6 +19,7 @@ var TOTALINITIATIVE
 var RED = "#4ee22727"
 var GREEN = "#9d13582b"
 var NORMAL = "#4e160c0c"
+var buttons = []
 
 # roll outcomes
 var D20outcome
@@ -28,6 +29,7 @@ var D20outcome
 signal d20Result(result)
 # warning-ignore:unused_signal
 signal compareOutcomes(first,second)
+signal buttonsChanged
 
 # character variables
 var first
