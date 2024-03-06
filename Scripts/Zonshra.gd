@@ -16,7 +16,7 @@ var armorClass = 21
 var initiative
 var canMove = false
 var isMoving = false
-var attackRange = 20
+var attackRange = 15
 var toHit = 11
 
 var gridIndex : int = -1

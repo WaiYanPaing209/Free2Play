@@ -8,7 +8,7 @@ var number = null
 
 func _ready():
 	initializeButtons()
-	Game.connect("buttonsChanged",self,"addButtons")
+	Game.connect("buttonsChanged",self,"onButtonsChanged")
 	
 func initializeButtons():
 	for i in range(len(Game.INITATIVE)):
@@ -16,6 +16,7 @@ func initializeButtons():
 		button.set_name(str(Game.INITATIVE[i].name))
 		button.get_node("name").text = str(Game.INITATIVE[i].name)
 		buttons.append(button)
+		$bg/Container.add_child(button)
 		
 
 func addButtons():
@@ -27,26 +28,33 @@ func addButtons():
 			button.set_name(str(Game.attackableTargets[i]))
 			button.get_node("name").text = str(Game.attackableTargets[i])
 			$bg/Container.add_child(button)
+	print("buttons :",$bg/Container.get_children())
 		
-func refreshButtons():
-	removeButtons()
+	
+func onButtonsChanged():
 	if buttons == []:
 		initializeButtons()
 	print("buttons reinitialized: ",buttons," Attackable Targets: ",Game.attackableTargets)
 	if Game.attackableTargets == []:
 		print("it becomes null")
+		for i in $bg/Container.get_children():
+			i.disabled = true
+			i.modulate = Color(.7,.7,.7,.7)
 		return
-	else:
-		for j in range(len(Game.attackableTargets)):
-			var find = buttons[j].name.find(Game.attackableTargets[j]) != 1
-			if find:
-				var name = Game.attackableTargets[j]
-				for button in buttons:
-					if button.name == name:
-						$bg/Container.add_child(button)
-				
-#	print(buttons)
-# Called when the node enters the scene tree for the first time.
+	for j in range(len(Game.attackableTargets)):
+		var find = buttons[j].name.find(Game.attackableTargets[j]) != 1
+		if find:
+			var name = Game.attackableTargets[j]
+			var node = $bg/Container.get_node(str(name))
+			print("found :",node)
+			node.disabled = false
+			node.modulate = Color(1,1,1,1)
+		else:
+			var name = Game.attackableTargets[j]
+			var node = $bg/Container.get_node(str(name))
+			node.disabled = true
+			node.modulate = Color(.7,.7,.7,.7)
+	print("buttons :",$bg/Container.get_children())
 
 func removeButtons():
 	for i in $bg/Container.get_children():
